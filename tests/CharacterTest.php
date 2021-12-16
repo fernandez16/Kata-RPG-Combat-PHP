@@ -4,13 +4,12 @@ namespace Tests;
 
 use PHPUnit\Framework\TestCase;
 use App\Character;
-use App\MeleeFighter;
-use App\RangedFighter;
+use App\Prop;
 
 class CharacterTest extends TestCase
 {
 
-	public function MeleeFighter_correctly_created()
+	public function test_meleeFighter_correctly_created()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -39,9 +38,7 @@ class CharacterTest extends TestCase
 		);
 	}
 
-	/** @test */
-
-	public function RangedFighter_correctly_created()
+	public function test_rangedFighter_correctly_created()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -70,9 +67,7 @@ class CharacterTest extends TestCase
 		);
 	}
 
-	/** @test */
-
-	public function calculate_damage()
+	public function test_calculate_damage()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -82,9 +77,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(120, $result);
 	}
 
-	/** @test */
-
-	public function calculate_healing()
+	public function test_calculate_healing()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -94,9 +87,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(60, $result);
 	}
 
-	/** @test */
-
-	public function level_up()
+	public function test_level_up()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -112,9 +103,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(4, $intelligenceResult);
 	}
 
-	/** @test */
-
-	public function character_level_check()
+	public function test_character_level_check()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -158,9 +147,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(1, $target5lvlWithinCasterResult);
 	}
 
-	/** @test */
-
-	public function character_range_check()
+	public function test_character_range_check()
 	{
 		// Given
 		$character = new character("Ranged Fighter");
@@ -174,9 +161,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(false, $notWithinnRangeResult);
 	}
 
-	/** @test */
-
-	public function character_can_join_factions()
+	public function test_character_can_join_factions()
 	{
 		// Given
 		$character = new character("Ranged Fighter");
@@ -199,9 +184,7 @@ class CharacterTest extends TestCase
 		);
 	}
 
-	/** @test */
-
-	public function character_can_leave_faction()
+	public function test_character_can_leave_faction()
 	{
 		// Given
 		$character = new character("Melee Fighter");
@@ -228,9 +211,7 @@ class CharacterTest extends TestCase
 		);
 	}
 
-	/** @test */
-
-	public function character_same_faction_check()
+	public function test_character_same_faction_check()
 	{
 		// Given
 		$character = new character("Ranged Fighter");
@@ -253,9 +234,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(false, $differentFactionResult);
 	}
 
-	/** @test */
-
-	public function character_deals_damage()
+	public function test_character_deals_damage()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -268,9 +247,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(880, $result);
 	}
 
-	/** @test */
-
-	public function character_dies_after_being_dealt_damage()
+	public function test_character_dies_after_being_dealt_damage()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -293,9 +270,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(0, $healthResult);
 	}
 
-	/** @test */
-
-	public function character_cannot_damage_themselves()
+	public function test_character_cannot_damage_themselves()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -307,9 +282,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(1000, $result);
 	}
 
-	/** @test */
-
-	public function character_dealdamage_multiplier()
+	public function test_character_dealdamage_multiplier()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -357,9 +330,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(760, $target5lvlWithinCasterResult);
 	}
 
-	/** @test */
-
-	public function character_cannot_damage_same_faction_target()
+	public function test_character_cannot_damage_same_faction_target()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -374,9 +345,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(1000, $result);
 	}
 
-	/** @test */
-
-	public function character_heals_damage()
+	public function test_character_heals_damage()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
@@ -390,9 +359,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(940, $result);
 	}
 
-	/** @test */
-
-	public function character_cannot_overheal()
+	public function test_character_cannot_overheal()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -408,9 +375,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(1000, $result);
 	}
 
-	/** @test */
-
-	public function character_cannot_heal_others()
+	public function test_character_cannot_heal_others()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -424,9 +389,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(880, $result);
 	}
 
-	/** @test */
-
-	public function character_healing_factions()
+	public function test_character_healing_factions()
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
@@ -453,9 +416,7 @@ class CharacterTest extends TestCase
 		$this->assertEquals(880, $differentFactionResult);
 	}
 
-	/** @test */
-
-	// public function prop_can_be_created()
+	// test_public function prop_can_be_created()
 	// {
 	// 	// Given
 	// 	// When

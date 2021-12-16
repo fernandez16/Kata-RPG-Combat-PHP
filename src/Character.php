@@ -138,8 +138,9 @@ class Character
             &&
             $this !== $target
         ) {
+            $damage = $this->CalculateDamage();
             $damageMultiplier = $this->LevelCheck($this->level, $target->level);
-            $target->health = $target->health - $this->CalculateDamage() * $damageMultiplier;
+            $target->health = $target->health - $damage * $damageMultiplier;
             if ($target->health <= 0) {
                 $target->health = 0;
                 $target->alive = false;
@@ -159,11 +160,8 @@ class Character
             $target->health = $target->health + $this->CalculateHealing();
             if ($target->health >= 1000) {
                 $target->health = 1000;
-                return;
             }
-            return;
         };
-        return;
     }
 
     public function getClass()
