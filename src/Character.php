@@ -6,15 +6,30 @@ use Error;
 
 class Character
 {
-    public $health;
-    public $level;
-    public $alive;
-    public $factions;
 
-    public function __construct()
+    private $class;
+    private $health;
+    private $level;
+    private $strenght;
+    private $intelligence;
+    private $range;
+    private $alive;
+    private $factions;
+
+    public function __construct($choosenClass)
     {
+        if ($choosenClass === "Melee Fighter") {
+            $this->class = "Melee Fighter";
+            $this->range = 2;
+        } 
+        elseif ($choosenClass === "Ranged Fighter") {
+            $this->class = "Ranged Fighter";
+            $this->range = 20;
+        } 
         $this->health = 1000;
         $this->level = 1;
+        $this->strenght = 3;
+        $this->intelligence = 3;
         $this->alive = true;
         $this->factions = array(
             "factionOne" => 0,
@@ -22,6 +37,14 @@ class Character
             "factionThree" => 0,
             "factionFour" => 0,
         );
+    }
+
+    public function LevelUp()
+    {
+        $this->level ++;
+        if ($this->level % 2 === 0) {
+            # code...
+        }
     }
 
     public function LevelCheck($casterLevel, $targetLevel)
@@ -129,5 +152,45 @@ class Character
             return;
         };
         return;
+    }
+    
+    public function getClass()
+    {
+        return $this->class;
+    }
+
+    public function getHealth()
+    {
+        return $this->health;
+    }
+    
+    public function getLevel()
+    {
+        return $this->level;
+    }
+    
+    public function getRange()
+    {
+        return $this->range;
+    }
+    
+    public function getStrenght()
+    {
+        return $this->strenght;
+    }
+    
+    public function getIntelligence()
+    {
+        return $this->intelligence;
+    }
+    
+    public function getAlive()
+    {
+        return $this->alive;
+    }
+
+    public function getFactions()
+    {
+        return $this->factions;
     }
 }
