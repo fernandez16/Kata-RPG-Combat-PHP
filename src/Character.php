@@ -21,11 +21,10 @@ class Character
         if ($choosenClass === "Melee Fighter") {
             $this->class = "Melee Fighter";
             $this->range = 2;
-        } 
-        elseif ($choosenClass === "Ranged Fighter") {
+        } elseif ($choosenClass === "Ranged Fighter") {
             $this->class = "Ranged Fighter";
             $this->range = 20;
-        } 
+        }
         $this->health = 1000;
         $this->level = 1;
         $this->strenght = 3;
@@ -41,9 +40,10 @@ class Character
 
     public function LevelUp()
     {
-        $this->level ++;
+        $this->level++;
         if ($this->level % 2 === 0) {
-            # code...
+            $this->strenght ++;
+            $this->intelligence ++;
         }
     }
 
@@ -153,7 +153,7 @@ class Character
         };
         return;
     }
-    
+
     public function getClass()
     {
         return $this->class;
@@ -163,27 +163,27 @@ class Character
     {
         return $this->health;
     }
-    
+
     public function getLevel()
     {
         return $this->level;
     }
-    
+
     public function getRange()
     {
         return $this->range;
     }
-    
+
     public function getStrenght()
     {
         return $this->strenght;
     }
-    
+
     public function getIntelligence()
     {
         return $this->intelligence;
     }
-    
+
     public function getAlive()
     {
         return $this->alive;
