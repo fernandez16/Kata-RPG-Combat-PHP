@@ -38,12 +38,24 @@ class Character
         );
     }
 
+    public function CalculateDamage()
+    {
+        $damage = $this->strenght * 40;
+        return $damage;
+    }
+
+    public function CalculateHealing()
+    {
+        $heal = $this->strenght * 20;
+        return $heal;
+    }
+
     public function LevelUp()
     {
         $this->level++;
         if ($this->level % 2 === 0) {
-            $this->strenght ++;
-            $this->intelligence ++;
+            $this->strenght++;
+            $this->intelligence++;
         }
     }
 
@@ -117,7 +129,7 @@ class Character
         return false;
     }
 
-    public function DealDamage($target, $damage, $distance)
+    public function DealDamage($target, $distance)
     {
         if (
             $this->RangeCheck($this->range, $distance)
@@ -127,7 +139,7 @@ class Character
             $this !== $target
         ) {
             $damageMultiplier = $this->LevelCheck($this->level, $target->level);
-            $target->health = $target->health - $damage * $damageMultiplier;
+            $target->health = $target->health - $this->CalculateDamage() * $damageMultiplier;
             if ($target->health <= 0) {
                 $target->health = 0;
                 $target->alive = false;
@@ -135,7 +147,7 @@ class Character
         }
     }
 
-    public function HealDamage($target, $heal)
+    public function HealDamage($target)
     {
         if (
             $target->alive === true
@@ -144,7 +156,7 @@ class Character
                 ||
                 $this === $target)
         ) {
-            $target->health = $target->health + $heal;
+            $target->health = $target->health + $this->CalculateHealing();
             if ($target->health >= 1000) {
                 $target->health = 1000;
                 return;

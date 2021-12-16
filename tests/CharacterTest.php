@@ -72,15 +72,44 @@ class CharacterTest extends TestCase
 
 	/** @test */
 
+	public function calculate_damage()
+	{
+		// Given
+		$character = new Character("Melee Fighter");
+		// When 
+		$result = $character->CalculateDamage();
+		// Then
+		$this->assertEquals(120, $result);
+	}
+
+	/** @test */
+
+	public function calculate_healing()
+	{
+		// Given
+		$character = new Character("Melee Fighter");
+		// When 
+		$result = $character->CalculateHealing();
+		// Then
+		$this->assertEquals(60, $result);
+	}
+
+	/** @test */
+
 	public function level_up()
 	{
 		// Given
 		$character = new Character("Melee Fighter");
 		// When 
 		$character->LevelUp();
-		$result = $character->getLevel();
+		$character->LevelUp();
+		$levelResult = $character->getLevel();
+		$strenghtResult = $character->getStrenght();
+		$intelligenceResult = $character->getIntelligence();
 		// Then
-		$this->assertEquals(2, $result);
+		$this->assertEquals(3, $levelResult);
+		$this->assertEquals(4, $strenghtResult);
+		$this->assertEquals(4, $intelligenceResult);
 	}
 
 	/** @test */
@@ -231,13 +260,12 @@ class CharacterTest extends TestCase
 		// Given
 		$character = new Character("Melee Fighter");
 		$distance = 1;
-		$damage = 600;
 		$targetCharacter = new Character("Ranged Fighter");
 		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
+		$character->DealDamage($targetCharacter, $distance);
 		$result = $targetCharacter->getHealth();
 		// Then
-		$this->assertEquals(400, $result);
+		$this->assertEquals(880, $result);
 	}
 
 	/** @test */
@@ -247,10 +275,17 @@ class CharacterTest extends TestCase
 		// Given
 		$character = new Character("Ranged Fighter");
 		$distance = 15;
-		$damage = 1200;
 		$targetCharacter = new Character("Melee Fighter");
 		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
+		$character->DealDamage($targetCharacter, $distance);
 		$aliveResult = $targetCharacter->getAlive();
 		$healthResult = $targetCharacter->getHealth();
 		// Then
@@ -265,9 +300,8 @@ class CharacterTest extends TestCase
 		// Given
 		$character = new Character("Ranged Fighter");
 		$distance = 0;
-		$damage = 300;
 		// When 
-		$character->DealDamage($character, $damage, $distance);
+		$character->DealDamage($character, $distance);
 		$result = $character->getHealth();
 		// Then
 		$this->assertEquals(1000, $result);
@@ -285,7 +319,6 @@ class CharacterTest extends TestCase
 		$character->LevelUp();
 		$character->LevelUp();
 		$distance = 5;
-		$damage = 300;
 
 		$lowerLvlTargetCharacter = new Character("Melee Fighter");
 
@@ -308,20 +341,20 @@ class CharacterTest extends TestCase
 		$similarLvlTargetCharacter->LevelUp();
 		$similarLvlTargetCharacter->LevelUp();
 		// When 
-		$character->DealDamage($lowerLvlTargetCharacter, $damage, $distance);
+		$character->DealDamage($lowerLvlTargetCharacter, $distance);
 		$target5lvlBelowCasterResult = $lowerLvlTargetCharacter->getHealth();
 
-		$character->DealDamage($higherLvlTargetCharacter, $damage, $distance);
+		$character->DealDamage($higherLvlTargetCharacter, $distance);
 		$target5lvlAboveCasterResult = $higherLvlTargetCharacter->getHealth();
 
-		$character->DealDamage($similarLvlTargetCharacter, $damage, $distance);
+		$character->DealDamage($similarLvlTargetCharacter, $distance);
 		$target5lvlWithinCasterResult = $similarLvlTargetCharacter->getHealth();
 		// Then
-		$this->assertEquals(550, $target5lvlBelowCasterResult);
+		$this->assertEquals(640, $target5lvlBelowCasterResult);
 
-		$this->assertEquals(850, $target5lvlAboveCasterResult);
+		$this->assertEquals(880, $target5lvlAboveCasterResult);
 
-		$this->assertEquals(700, $target5lvlWithinCasterResult);
+		$this->assertEquals(760, $target5lvlWithinCasterResult);
 	}
 
 	/** @test */
@@ -332,11 +365,10 @@ class CharacterTest extends TestCase
 		$character = new Character("Melee Fighter");
 		$character->JoinFaction(1);
 		$distance = 1;
-		$damage = 600;
 		$targetCharacter = new Character("Melee Fighter");
 		$targetCharacter->JoinFaction(1);
 		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
+		$character->DealDamage($targetCharacter, $distance);
 		$result = $targetCharacter->getHealth();
 		// Then
 		$this->assertEquals(1000, $result);
@@ -348,16 +380,14 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new Character("Melee Fighter");
-		$heal = 600;
 		$aggressorCharacter = new Character("Melee Fighter");
 		$distance = 1;
-		$damage = 750;
-		$aggressorCharacter->DealDamage($character, $damage, $distance);
+		$aggressorCharacter->DealDamage($character, $distance);
 		// When 
-		$character->HealDamage($character, $heal);
+		$character->HealDamage($character);
 		$result = $character->getHealth();
 		// Then
-		$this->assertEquals(850, $result);
+		$this->assertEquals(940, $result);
 	}
 
 	/** @test */
@@ -366,13 +396,13 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new Character("Ranged Fighter");
-		$heal = 600;
 		$aggressorCharacter = new Character("Melee Fighter");
 		$distance = 1;
-		$damage = 500;
-		$aggressorCharacter->DealDamage($character, $damage, $distance);
+		$aggressorCharacter->DealDamage($character, $distance);
 		// When
-		$character->HealDamage($character, $heal);
+		$character->HealDamage($character);
+		$character->HealDamage($character);
+		$character->HealDamage($character);
 		$result = $character->getHealth();
 		// Then
 		$this->assertEquals(1000, $result);
@@ -385,15 +415,13 @@ class CharacterTest extends TestCase
 		// Given
 		$character = new Character("Ranged Fighter");
 		$distance = 20;
-		$damage = 750;
-		$heal = 600;
 		$targetCharacter = new Character("Melee Fighter");
-		$character->DealDamage($targetCharacter, $damage, $distance);
+		$character->DealDamage($targetCharacter, $distance);
 		// When 
-		$character->HealDamage($targetCharacter, $heal);
+		$character->HealDamage($targetCharacter);
 		$result = $targetCharacter->getHealth();
 		// Then
-		$this->assertEquals(250, $result);
+		$this->assertEquals(880, $result);
 	}
 
 	/** @test */
@@ -403,27 +431,26 @@ class CharacterTest extends TestCase
 		// Given
 		$character = new Character("Ranged Fighter");
 		$character->JoinFaction(1);
-		$distance = 10;
-		$damage = 750;
-		$heal = 800;
+		$characterDistance = 10;
 
 		$sameFactionCharacter = new Character("Ranged Fighter");
 		$sameFactionCharacter->JoinFaction(1);
 
 		$differentFactionCharacter = new Character("Melee Fighter");
 		$differentFactionCharacter->JoinFaction(2);
+		$differentFactionCharacterDistance = 1;
 
-		$character->DealDamage($sameFactionCharacter, $damage, $distance);
-		$character->DealDamage($differentFactionCharacter, $damage, $distance);
+		$differentFactionCharacter->DealDamage($sameFactionCharacter, $differentFactionCharacterDistance);
+		$character->DealDamage($differentFactionCharacter, $characterDistance);
 		// When 
-		$character->HealDamage($sameFactionCharacter, $heal);
+		$character->HealDamage($sameFactionCharacter);
 		$sameFactionResult = $sameFactionCharacter->getHealth();
 		
-		$character->HealDamage($differentFactionCharacter, $heal);
+		$character->HealDamage($differentFactionCharacter);
 		$differentFactionResult = $differentFactionCharacter->getHealth();
 		// Then
-		$this->assertEquals(1000, $sameFactionResult);
-		$this->assertEquals(250, $differentFactionResult);
+		$this->assertEquals(940, $sameFactionResult);
+		$this->assertEquals(880, $differentFactionResult);
 	}
 
 	/** @test */
