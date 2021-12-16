@@ -9,7 +9,6 @@ class Character
     public $health;
     public $level;
     public $alive;
-    public $class;
     public $factions;
 
     public function __construct()
@@ -25,38 +24,6 @@ class Character
         );
     }
 
-    public function JoinFaction($faction)
-    {
-        if ($faction === 1) {
-            $this->faction["factionOne"] = 1;
-        }
-        if ($faction === 2) {
-            $this->faction["factionTwo"] = 1;
-        }
-        if ($faction === 3) {
-            $this->faction["factionThree"] = 1;
-        }
-        if ($faction === 4) {
-            $this->faction["factionFour"] = 1;
-        }
-    }
-
-    public function LeaveFaction($faction)
-    {
-        if ($faction === 1) {
-            $this->faction["factionOne"] = 0;
-        }
-        if ($faction === 2) {
-            $this->faction["factionTwo"] = 0;
-        }
-        if ($faction === 3) {
-            $this->faction["factionThree"] = 0;
-        }
-        if ($faction === 4) {
-            $this->faction["factionFour"] = 0;
-        }
-    }
-
     public function LevelCheck($casterLevel, $targetLevel)
     {
         $levelDifference = $casterLevel - $targetLevel;
@@ -64,7 +31,7 @@ class Character
             return 1.5;
         }
         if ($levelDifference <= -5) {
-            return 0.75;
+            return 0.5;
         }
         return 1;
     }
@@ -74,20 +41,53 @@ class Character
         return ($casterRange >= $distance);
     }
 
-    public function SameFactionCheck($casterFaction, $targetFaction)
+    public function JoinFaction($faction)
     {
-        foreach ($casterFaction as $faction => $status) {
-            if ($status === 0) {
-                unset($casterFaction[$faction]);
-            }
+        if ($faction === 1) {
+            $this->factions["factionOne"] = 1;
         }
-        foreach ($targetFaction as $faction => $status) {
+        if ($faction === 2) {
+            $this->factions["factionTwo"] = 1;
+        }
+        if ($faction === 3) {
+            $this->factions["factionThree"] = 1;
+        }
+        if ($faction === 4) {
+            $this->factions["factionFour"] = 1;
+        }
+    }
+
+    public function LeaveFaction($faction)
+    {
+        if ($faction === 1) {
+            $this->factions["factionOne"] = 0;
+        }
+        if ($faction === 2) {
+            $this->factions["factionTwo"] = 0;
+        }
+        if ($faction === 3) {
+            $this->factions["factionThree"] = 0;
+        }
+        if ($faction === 4) {
+            $this->factions["factionFour"] = 0;
+        }
+    }
+
+    public function SameFactionCheck($casterFactions, $targetFactions)
+    {
+        foreach ($casterFactions as $faction => $status) {
             if ($status === 0) {
-                unset($targetFaction[$faction]);
+                unset($casterFactions[$faction]);
             }
         }
 
-        if ($casterFaction !== array_diff_key($casterFaction, $targetFaction)) {
+        foreach ($targetFactions as $faction => $status) {
+            if ($status === 0) {
+                unset($targetFactions[$faction]);
+            }
+        }
+
+        if ($casterFactions !== array_diff_key($casterFactions, $targetFactions)) {
             return true;
         }
 
@@ -96,13 +96,12 @@ class Character
 
     public function DealDamage($target, $damage, $distance)
     {
-        if ($this === $target) {
-            return;
-        }
         if (
             $this->RangeCheck($this->range, $distance)
             &&
-            !$this->SameFactionCheck($this->faction, $target->faction)
+            !$this->SameFactionCheck($this->factions, $target->factions)
+            &&
+            $this !== $target
         ) {
             $damageMultiplier = $this->LevelCheck($this->level, $target->level);
             $target->health = $target->health - $damage * $damageMultiplier;
@@ -115,7 +114,13 @@ class Character
 
     public function HealDamage($target, $heal)
     {
-        if ($target->alive === true && $this->SameFactionCheck($this->faction, $target->faction)) {
+        if (
+            $target->alive === true
+            &&
+            ($this->SameFactionCheck($this->factions, $target->factions)
+                ||
+                $this === $target)
+        ) {
             $target->health = $target->health + $heal;
             if ($target->health >= 1000) {
                 $target->health = 1000;

@@ -12,38 +12,212 @@ class CharacterTest extends TestCase
 
 	/** @test */
 
-	public function character_health_is_1000()
+	public function character_correctly_created()
 	{
 		// Given
 		$character = new Character;
-		// When 
-		$result = $character->health;
+		// When
+		$healthResult = $character->health;
+		$levelResult = $character->level;
+		$aliveResult = $character->alive;
+		$factionResult = $character->factions;
 		// Then
-		$this->assertEquals(1000, $result);
+		$this->assertEquals(1000, $healthResult);
+		$this->assertEquals(1, $levelResult);
+		$this->assertEquals(true, $aliveResult);
+		$this->assertEquals(
+			array(
+				"factionOne" => 0,
+				"factionTwo" => 0,
+				"factionThree" => 0,
+				"factionFour" => 0,
+			),
+
+			$factionResult
+		);
 	}
 
 	/** @test */
 
-	public function character_level_is_1()
+	public function RangedFighter_correctly_created()
 	{
 		// Given
-		$character = new Character;
+		$character = new RangedFighter;
 		// When 
-		$result = $character->level;
+		$healthResult = $character->health;
+		$levelResult = $character->level;
+		$aliveResult = $character->alive;
+		$factionResult = $character->factions;
+		$rangeResult = $character->range;
 		// Then
-		$this->assertEquals(1, $result);
+		$this->assertEquals(1000, $healthResult);
+		$this->assertEquals(1, $levelResult);
+		$this->assertEquals(true, $aliveResult);
+		$this->assertEquals(20, $rangeResult);
+		$this->assertEquals(
+			array(
+				"factionOne" => 0,
+				"factionTwo" => 0,
+				"factionThree" => 0,
+				"factionFour" => 0,
+			),
+
+			$factionResult
+		);
 	}
 
 	/** @test */
 
-	public function character_alive_is_true()
+	public function MeleeFighter_correctly_created()
+	{
+		// Given
+		$character = new MeleeFighter;
+		// When 
+		$healthResult = $character->health;
+		$levelResult = $character->level;
+		$aliveResult = $character->alive;
+		$factionResult = $character->factions;
+		$rangeResult = $character->range;
+		// Then
+		$this->assertEquals(1000, $healthResult);
+		$this->assertEquals(1, $levelResult);
+		$this->assertEquals(true, $aliveResult);
+		$this->assertEquals(2, $rangeResult);
+		$this->assertEquals(
+			array(
+				"factionOne" => 0,
+				"factionTwo" => 0,
+				"factionThree" => 0,
+				"factionFour" => 0,
+			),
+
+			$factionResult
+		);
+	}
+
+	/** @test */
+
+	public function character_level_check()
+	{
+		// Given
+		$character = new RangedFighter;
+		$character->level = 6;
+
+		$lowerLvlTargetCharacter = new Character;
+		$lowerLvlTargetCharacter->level = 1;
+
+		$higherLvlTargetCharacter = new Character;
+		$higherLvlTargetCharacter->level = 11;
+
+		$similarLvlTargetCharacter = new Character;
+		$similarLvlTargetCharacter->level = 6;
+		// When 
+		$target5lvlBelowCasterResult = $character->LevelCheck($character->level, $lowerLvlTargetCharacter->level);
+
+		$target5lvlAboveCasterResult = $character->LevelCheck($character->level, $higherLvlTargetCharacter->level);
+
+		$target5lvlWithinCasterResult = $character->LevelCheck($character->level, $similarLvlTargetCharacter->level);
+		// Then
+		$this->assertEquals(1.5, $target5lvlBelowCasterResult);
+
+		$this->assertEquals(0.5, $target5lvlAboveCasterResult);
+
+		$this->assertEquals(1, $target5lvlWithinCasterResult);
+	}
+
+	/** @test */
+
+	public function character_range_check()
+	{
+		// Given
+		$character = new RangedFighter;
+		$withinRangeDistance = 10;
+		$notWithinRangeDistance = 30;
+		// When 
+		$withinRangeResult = $character->RangeCheck($character->range, $withinRangeDistance);
+		$notWithinnRangeResult = $character->RangeCheck($character->range, $notWithinRangeDistance);
+		// Then
+		$this->assertEquals(true, $withinRangeResult);
+		$this->assertEquals(false, $notWithinnRangeResult);
+	}
+
+	/** @test */
+
+	public function character_can_join_factions()
+	{
+		// Given
+		$character = new MeleeFighter;
+		// When 
+		$character->JoinFaction(1);
+		$character->JoinFaction(2);
+		$character->JoinFaction(3);
+		$character->JoinFaction(4);
+		$result = $character->factions;
+		// Then
+		$this->assertEquals(
+			array(
+				"factionOne" => 1,
+				"factionTwo" => 1,
+				"factionThree" => 1,
+				"factionFour" => 1,
+			),
+
+			$result
+		);
+	}
+
+	/** @test */
+
+	public function character_can_leave_faction()
+	{
+		// Given
+		$character = new MeleeFighter;
+		$character->JoinFaction(1);
+		$character->JoinFaction(2);
+		$character->JoinFaction(3);
+		$character->JoinFaction(4);
+		// When 
+		$character->LeaveFaction(1);
+		$character->LeaveFaction(2);
+		$character->LeaveFaction(3);
+		$character->LeaveFaction(4);
+		$result = $character->factions;
+		// Then
+		$this->assertEquals(
+			array(
+				"factionOne" => 0,
+				"factionTwo" => 0,
+				"factionThree" => 0,
+				"factionFour" => 0,
+			),
+
+			$result
+		);
+	}
+
+	/** @test */
+
+	public function character_same_faction_check()
 	{
 		// Given
 		$character = new Character;
+		$character->JoinFaction(1);
+		$character->JoinFaction(2);
+		$character->JoinFaction(3);
+
+		$sameFactionsTargetCharacter = new Character;
+		$sameFactionsTargetCharacter->JoinFaction(1);
+		$sameFactionsTargetCharacter->JoinFaction(2);
+
+		$differentFactionsTargetCharacter = new Character;
+		$differentFactionsTargetCharacter->JoinFaction(4);
 		// When 
-		$result = $character->alive;
+		$sameFactionResult = $character->SameFactionCheck($character->factions, $sameFactionsTargetCharacter->factions);
+		
+		$differentFactionResult = $character->SameFactionCheck($character->factions, $differentFactionsTargetCharacter->factions);
 		// Then
-		$this->assertEquals(true, $result);
+		$this->assertEquals(true, $sameFactionResult);
+		$this->assertEquals(false, $differentFactionResult);
 	}
 
 	/** @test */
@@ -52,11 +226,9 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new MeleeFighter;
-		$character->JoinFaction(1);
 		$distance = 1;
 		$damage = 600;
 		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(2);
 		// When 
 		$character->DealDamage($targetCharacter, $damage, $distance);
 		$result = $targetCharacter->health;
@@ -70,16 +242,84 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new RangedFighter;
-		$character->JoinFaction(1);
 		$distance = 15;
 		$damage = 1200;
 		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(2);
 		// When 
 		$character->DealDamage($targetCharacter, $damage, $distance);
-		$result = $targetCharacter->alive;
+		$aliveResult = $targetCharacter->alive;
+		$healthResult = $targetCharacter->health;
 		// Then
-		$this->assertEquals(false, $result);
+		$this->assertEquals(false, $aliveResult);
+		$this->assertEquals(0, $healthResult);
+	}
+
+	/** @test */
+
+	public function character_cannot_damage_themselves()
+	{
+		// Given
+		$character = new RangedFighter;
+		$distance = 0;
+		$damage = 300;
+		// When 
+		$character->DealDamage($character, $damage, $distance);
+		$result = $character->health;
+		// Then
+		$this->assertEquals(1000, $result);
+	}
+
+	/** @test */
+
+	public function character_dealdamage_multiplier()
+	{
+		// Given
+		$character = new RangedFighter;
+		$character->level = 6;
+		$distance = 5;
+		$damage = 300;
+
+		$lowerLvlTargetCharacter = new Character;
+		$lowerLvlTargetCharacter->level = 1;
+
+		$higherLvlTargetCharacter = new Character;
+		$higherLvlTargetCharacter->level = 11;
+
+		$similarLvlTargetCharacter = new Character;
+		$similarLvlTargetCharacter->level = 6;
+		// When 
+		$character->DealDamage($lowerLvlTargetCharacter, $damage, $distance);
+		$target5lvlBelowCasterResult = $lowerLvlTargetCharacter->health;
+
+		$character->DealDamage($higherLvlTargetCharacter, $damage, $distance);
+		$target5lvlAboveCasterResult = $higherLvlTargetCharacter->health;
+
+		$character->DealDamage($similarLvlTargetCharacter, $damage, $distance);
+		$target5lvlWithinCasterResult = $similarLvlTargetCharacter->health;
+		// Then
+		$this->assertEquals(550, $target5lvlBelowCasterResult);
+
+		$this->assertEquals(850, $target5lvlAboveCasterResult);
+
+		$this->assertEquals(700, $target5lvlWithinCasterResult);
+	}
+
+	/** @test */
+
+	public function character_cannot_damage_same_faction_target()
+	{
+		// Given
+		$character = new MeleeFighter;
+		$character->JoinFaction(1);
+		$distance = 1;
+		$damage = 600;
+		$targetCharacter = new Character;
+		$targetCharacter->JoinFaction(1);
+		// When 
+		$character->DealDamage($targetCharacter, $damage, $distance);
+		$result = $targetCharacter->health;
+		// Then
+		$this->assertEquals(1000, $result);
 	}
 
 	/** @test */
@@ -88,7 +328,6 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new Character;
-		$character->JoinFaction(1);
 		$heal = 600;
 		$character->health = 250;
 		// When 
@@ -104,7 +343,6 @@ class CharacterTest extends TestCase
 	{
 		// Given
 		$character = new Character;
-		$character->JoinFaction(1);
 		$heal = 600;
 		$character->health = 500;
 		// When 
@@ -116,30 +354,12 @@ class CharacterTest extends TestCase
 
 	/** @test */
 
-	public function character_cannot_damage_themselves()
-	{
-		// Given
-		$character = new RangedFighter;
-		$character->JoinFaction(1);
-		$distance = 0;
-		$damage = 300;
-		// When 
-		$character->DealDamage($character, $damage, $distance);
-		$result = $character->health;
-		// Then
-		$this->assertEquals(1000, $result);
-	}
-
-	/** @test */
-
 	public function character_cannot_heal_others()
 	{
 		// Given
 		$character = new Character;
-		$character->JoinFaction(1);
 		$heal = 600;
 		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(2);
 		$targetCharacter->health = 250;
 		// When 
 		$character->HealDamage($targetCharacter, $heal);
@@ -150,209 +370,38 @@ class CharacterTest extends TestCase
 
 	/** @test */
 
-	public function character_level_check()
-	{
-		// Given
-		$character = new RangedFighter;
-		$character->level = 6;
-		$targetCharacter1 = new Character;
-		$targetCharacter1->level = 1;
-		$targetCharacter2 = new Character;
-		$targetCharacter2->level = 11;
-		$targetCharacter3 = new Character;
-		$targetCharacter3->level = 6;
-		// When 
-		$targetBelowCasterResult = $character->LevelCheck($character->level, $targetCharacter1->level);
-		$targetAboveCasterResult = $character->LevelCheck($character->level, $targetCharacter2->level);
-		$targetSimilarToCasterResult = $character->LevelCheck($character->level, $targetCharacter3->level);
-		// Then
-		$this->assertEquals(1.5, $targetBelowCasterResult);
-		$this->assertEquals(0.75, $targetAboveCasterResult);
-		$this->assertEquals(1, $targetSimilarToCasterResult);
-	}
-
-	/** @test */
-
-	public function character_damage_multiplied_if_target_is_5_levels_or_more_below_the_attacker()
-	{
-		// Given
-		$character = new RangedFighter;
-		$character->JoinFaction(1);
-		$character->level = 6;
-		$distance = 20;
-		$damage = 300;
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(2);
-		$targetCharacter->level = 1;
-		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
-		$result = $targetCharacter->health;
-		// Then
-		$this->assertEquals(550, $result);
-	}
-
-	/** @test */
-
-	public function character_damage_divided_if_target_is_5_levels_or_more_above_the_attacker()
-	{
-		// Given
-		$character = new MeleeFighter;
-		$character->JoinFaction(1);
-		$character->level = 1;
-		$distance = 2;
-		$damage = 600;
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(2);
-		$targetCharacter->level = 6;
-		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
-		$result = $targetCharacter->health;
-		// Then
-		$this->assertEquals(550, $result);
-	}
-
-	/** @test */
-
-	public function character_has_a_max_range()
-	{
-		// Given
-		$character = new RangedFighter;
-		// When 
-		$result = $character->range;
-		// Then
-		$this->assertEquals(20, $result);
-	}
-
-	/** @test */
-
-	public function character_range_check()
-	{
-		// Given
-		$character = new RangedFighter;
-		$distance = 10;
-		// When 
-		$result = $character->RangeCheck($character->range, $distance);
-		// Then
-		$this->assertEquals(true, $result);
-	}
-
-	/** @test */
-
-	public function character_can_join_faction()
-	{
-		// Given
-		$character = new MeleeFighter;
-		// When 
-		$character->JoinFaction(1);
-		$result = $character->faction["factionOne"];
-		// Then
-		$this->assertEquals(1, $result);
-	}
-
-	/** @test */
-
-	public function character_can_join_several_factions()
-	{
-		// Given
-		$character = new MeleeFighter;
-		// When 
-		$character->JoinFaction(3);
-		$character->JoinFaction(1);
-		$result = $character->faction["factionThree"];
-		// Then
-		$this->assertEquals(1, $result);
-	}
-
-	/** @test */
-
-	public function character_can_leave_faction()
-	{
-		// Given
-		$character = new MeleeFighter;
-		$character->JoinFaction(1);
-		// When 
-		$character->LeaveFaction(1);
-		$result = $character->faction["factionOne"];
-		// Then
-		$this->assertEquals(0, $result);
-	}
-
-	/** @test */
-
-	public function character_same_faction_check()
+	public function character_healing_factions()
 	{
 		// Given
 		$character = new Character;
 		$character->JoinFaction(1);
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(1);
-		$character2 = new Character;
-		$character2->JoinFaction(1);
-		$targetCharacter2 = new Character;
-		$targetCharacter2->JoinFaction(2);
-		// When 
-		$sameFaction = $character->SameFactionCheck($character->faction, $targetCharacter->faction);
-		$differentFaction = $character2->SameFactionCheck($character2->faction, $targetCharacter2->faction);
-		// Then
-		$this->assertEquals(true, $sameFaction);
-		$this->assertEquals(false, $differentFaction);
-	}
-
-	/** @test */
-
-	public function character_cannot_damage_same_faction_target()
-	{
-		// Given
-		$character = new MeleeFighter;
-		$character->JoinFaction(1);
-		$character->JoinFaction(2);
-		$distance = 1;
-		$damage = 600;
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(1);
-		// When 
-		$character->DealDamage($targetCharacter, $damage, $distance);
-		$result = $targetCharacter->health;
-		// Then
-		$this->assertEquals(1000, $result);
-	}
-
-	/** @test */
-
-	public function character_can_heal_same_faction_members()
-	{
-		// Given
-		$character = new Character;
-		$character->JoinFaction(1);
-		$character->JoinFaction(2);
 		$heal = 800;
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(1);
-		$targetCharacter->health = 250;
+
+		$sameFactionCharacter = new Character;
+		$sameFactionCharacter->JoinFaction(1);
+		$sameFactionCharacter->health = 250;
+
+		$differentFactionCharacter = new Character;
+		$differentFactionCharacter->JoinFaction(2);
+		$differentFactionCharacter->health = 250;
 		// When 
-		$character->HealDamage($targetCharacter, $heal);
-		$result = $targetCharacter->health;
+		$character->HealDamage($sameFactionCharacter, $heal);
+		$sameFactionResult = $sameFactionCharacter->health;
+		
+		$character->HealDamage($differentFactionCharacter, $heal);
+		$differentFactionResult = $differentFactionCharacter->health;
 		// Then
-		$this->assertEquals(1000, $result);
+		$this->assertEquals(1000, $sameFactionResult);
+		$this->assertEquals(250, $differentFactionResult);
 	}
 
 	/** @test */
 
-	public function prop_can_be_created()
-	{
-		// Given
-		$character = new Character;
-		$character->JoinFaction(1);
-		$character->JoinFaction(2);
-		$heal = 800;
-		$targetCharacter = new Character;
-		$targetCharacter->JoinFaction(1);
-		$targetCharacter->health = 250;
-		// When 
-		$character->HealDamage($targetCharacter, $heal);
-		$result = $targetCharacter->health;
-		// Then
-		$this->assertEquals(1000, $result);
-	}
+	// public function prop_can_be_created()
+	// {
+	// 	// Given
+	// 	// When
+	// 	// Then
+	// }
 
 }
