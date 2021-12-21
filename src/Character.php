@@ -3,17 +3,19 @@
 namespace App;
 
 use Error;
+use phpDocumentor\Reflection\Types\Intersection;
 
 class Character
 {
 
     private $class;
     private $health;
+    private $alive;
     private $level;
+    private $range;
     private $strenght;
     private $intelligence;
-    private $range;
-    private $alive;
+    private $position;
     private $factions;
 
     public function __construct($choosenClass)
@@ -26,16 +28,28 @@ class Character
             $this->range = 20;
         }
         $this->health = 1000;
+        $this->alive = true;
         $this->level = 1;
         $this->strenght = 3;
         $this->intelligence = 3;
-        $this->alive = true;
-        $this->factions = array(
-            "factionOne" => 0,
-            "factionTwo" => 0,
-            "factionThree" => 0,
-            "factionFour" => 0,
+        $this->position = array(
+            "x" => 0,
+            "y" => 0,
         );
+        $this->factions = array();
+    }
+
+    public function moveCharacter($movement)
+    {
+        $finalPosition = $this->position;
+        array_walk(
+            $finalPosition,
+            function (&$val, $coordinate, $movementWalk) {
+                $val += $movementWalk[$coordinate];
+            },
+            $movement
+        );
+        $this->position = $finalPosition;
     }
 
     public function CalculateDamage()
@@ -71,68 +85,51 @@ class Character
         return 1;
     }
 
-    public function RangeCheck($casterRange, $distance)
+    public function CalculateDistance($targetPosition)
     {
+        $distanceDifference = $this->position;
+        array_walk(
+            $distanceDifference,
+            function (&$val, $coordinate, $movementWalk) {
+                $val -= $movementWalk[$coordinate];
+            },
+            $targetPosition
+        );
+        $distance = 0;
+        foreach ($distanceDifference as $value) {
+            $distance += abs($value);
+        };
+        return $distance;
+    }
+
+    public function RangeCheck($casterRange, $targetPosition)
+    {
+        $distance = $this->CalculateDistance($targetPosition);
         return ($casterRange >= $distance);
     }
 
     public function JoinFaction($faction)
     {
-        if ($faction === 1) {
-            $this->factions["factionOne"] = 1;
-        }
-        if ($faction === 2) {
-            $this->factions["factionTwo"] = 1;
-        }
-        if ($faction === 3) {
-            $this->factions["factionThree"] = 1;
-        }
-        if ($faction === 4) {
-            $this->factions["factionFour"] = 1;
-        }
+        array_push($this->factions, $faction);
     }
 
     public function LeaveFaction($faction)
     {
-        if ($faction === 1) {
-            $this->factions["factionOne"] = 0;
-        }
-        if ($faction === 2) {
-            $this->factions["factionTwo"] = 0;
-        }
-        if ($faction === 3) {
-            $this->factions["factionThree"] = 0;
-        }
-        if ($faction === 4) {
-            $this->factions["factionFour"] = 0;
-        }
+        $this->factions = array_diff($this->factions, array($faction));
     }
 
     public function SameFactionCheck($casterFactions, $targetFactions)
     {
-        foreach ($casterFactions as $faction => $status) {
-            if ($status === 0) {
-                unset($casterFactions[$faction]);
-            }
-        }
-
-        foreach ($targetFactions as $faction => $status) {
-            if ($status === 0) {
-                unset($targetFactions[$faction]);
-            }
-        }
-
-        if ($casterFactions !== array_diff_key($casterFactions, $targetFactions)) {
+        if (array_intersect($casterFactions, $targetFactions)) {
             return true;
         }
-
         return false;
     }
 
-    public function DealDamage($target, $distance)
+    public function DealDamage($target)
     {
         if (
-            $this->RangeCheck($this->range, $distance)
+            $this->RangeCheck($this->range, $target->position)
             &&
             !$this->SameFactionCheck($this->factions, $target->factions)
             &&
@@ -174,6 +171,11 @@ class Character
         return $this->health;
     }
 
+    public function getAlive()
+    {
+        return $this->alive;
+    }
+
     public function getLevel()
     {
         return $this->level;
@@ -194,9 +196,9 @@ class Character
         return $this->intelligence;
     }
 
-    public function getAlive()
+    public function getPosition()
     {
-        return $this->alive;
+        return $this->position;
     }
 
     public function getFactions()
