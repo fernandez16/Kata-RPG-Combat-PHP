@@ -73,9 +73,12 @@ class Character
         }
     }
 
-    public function LevelCheck($casterLevel, $targetLevel)
+    public function LevelCheck($caster, $target)
     {
-        $levelDifference = $casterLevel - $targetLevel;
+        if (get_class($target) !== "App\Character") {
+            return 1;
+        }
+        $levelDifference = $caster->getLevel() - $target->getLevel();
         if ($levelDifference >= 5) {
             return 1.5;
         }
@@ -102,6 +105,23 @@ class Character
         return $distance;
     }
 
+    public function targeteabilityCheck($target)
+    {
+        if (get_class($target) === "App\Character") {
+            if ($target->getHealth() > 0 && $target->getAlive() === true) {
+                return true;
+            }
+        }
+
+        if (get_class($target) === "App\Prop") {
+            if ($target->getHealth() > 0) {
+                return true;
+            }
+        }
+
+        return false;
+    }
+
     public function RangeCheck($casterRange, $targetPosition)
     {
         $distance = $this->CalculateDistance($targetPosition);
@@ -118,9 +138,12 @@ class Character
         $this->factions = array_diff($this->factions, array($faction));
     }
 
-    public function SameFactionCheck($casterFactions, $targetFactions)
+    public function SameFactionCheck($caster, $target)
     {
-        if (array_intersect($casterFactions, $targetFactions)) {
+        if (get_class($target) !== "App\Character") {
+            return false;
+        }
+        if (array_intersect($caster->getFactions(), $target->getFactions())) {
             return true;
         }
         return false;
@@ -129,18 +152,24 @@ class Character
     public function DealDamage($target)
     {
         if (
-            $this->RangeCheck($this->range, $target->position)
+            $this->targeteabilityCheck($target)
             &&
-            !$this->SameFactionCheck($this->factions, $target->factions)
+            $this->RangeCheck($this->range, $target->getPosition())
+            &&
+            !$this->SameFactionCheck($this, $target)
             &&
             $this !== $target
         ) {
             $damage = $this->CalculateDamage();
-            $damageMultiplier = $this->LevelCheck($this->level, $target->level);
-            $target->health = $target->health - $damage * $damageMultiplier;
-            if ($target->health <= 0) {
-                $target->health = 0;
-                $target->alive = false;
+            $damageMultiplier = $this->LevelCheck($this, $target);
+            $target->setHealth($target->getHealth() - $damage * $damageMultiplier);
+            if ($target->getHealth() <= 0) {
+                if (get_class($target) !== "App\Character") {
+                    unset($target);
+                    return;
+                }
+                $target->setHealth(0);
+                $target->setAlive(false);
             }
         }
     }
@@ -148,15 +177,15 @@ class Character
     public function HealDamage($target)
     {
         if (
-            $target->alive === true
+            $this->targeteabilityCheck($target)
             &&
-            ($this->SameFactionCheck($this->factions, $target->factions)
+            ($this->SameFactionCheck($this, $target)
                 ||
                 $this === $target)
         ) {
-            $target->health = $target->health + $this->CalculateHealing();
+            $target->setHealth($target->getHealth() + $this->CalculateHealing());
             if ($target->health >= 1000) {
-                $target->health = 1000;
+                $target->setHealth(1000);
             }
         };
     }
@@ -171,9 +200,23 @@ class Character
         return $this->health;
     }
 
+    public function setHealth($health)
+    {
+        $this->health = $health;
+
+        return $this;
+    }
+
     public function getAlive()
     {
         return $this->alive;
+    }
+
+    public function setAlive($alive)
+    {
+        $this->alive = $alive;
+
+        return $this;
     }
 
     public function getLevel()

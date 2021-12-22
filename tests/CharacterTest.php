@@ -16,7 +16,7 @@ class CharacterTest extends TestCase
 		// When 
 		$classResult = $character->getClass();
 		$healthResult = $character->getHealth();
-		$levelResult = $character->getLevel();
+		$levelResult = $character->getLevel($character);
 		$rangeResult = $character->getRange();
 		$aliveResult = $character->getAlive();
 		$factionResult = $character->getFactions();
@@ -110,6 +110,30 @@ class CharacterTest extends TestCase
 		$this->assertEquals(4, $intelligenceResult);
 	}
 
+	public function test_character_targeteability_check()
+	{
+		// Given
+		$character = new character("Ranged Fighter");
+		$targeteableCharacter = new character("Ranged Fighter");
+		$untargeteableTarget = new character("Ranged Fighter");
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		$character->DealDamage($untargeteableTarget);
+		// When 
+		$targeteableCharacterResult = $character->targeteabilityCheck($targeteableCharacter);
+		$untargeteableTargetResult = $character->targeteabilityCheck($untargeteableTarget);
+		// Then
+		$this->assertEquals(true, $targeteableCharacterResult);
+		$this->assertEquals(false, $untargeteableTargetResult);
+		// Given
+	}
+
 	public function test_character_level_check()
 	{
 		// Given
@@ -141,11 +165,11 @@ class CharacterTest extends TestCase
 		$similarLvlTargetCharacter->LevelUp();
 		$similarLvlTargetCharacter->LevelUp();
 		// When 
-		$target5lvlBelowCasterResult = $character->LevelCheck($character->getLevel(), $lowerLvlTargetCharacter->getLevel());
+		$target5lvlBelowCasterResult = $character->LevelCheck($character, $lowerLvlTargetCharacter);
 
-		$target5lvlAboveCasterResult = $character->LevelCheck($character->getLevel(), $higherLvlTargetCharacter->getLevel());
+		$target5lvlAboveCasterResult = $character->LevelCheck($character, $higherLvlTargetCharacter);
 
-		$target5lvlWithinCasterResult = $character->LevelCheck($character->getLevel(), $similarLvlTargetCharacter->getLevel());
+		$target5lvlWithinCasterResult = $character->LevelCheck($character, $similarLvlTargetCharacter);
 		// Then
 		$this->assertEquals(1.5, $target5lvlBelowCasterResult);
 
@@ -216,9 +240,9 @@ class CharacterTest extends TestCase
 		$differentFactionsTargetCharacter = new character("Ranged Fighter");
 		$differentFactionsTargetCharacter->JoinFaction(4);
 		// When 
-		$sameFactionResult = $character->SameFactionCheck($character->getFactions(), $sameFactionsTargetCharacter->getFactions());
+		$sameFactionResult = $character->SameFactionCheck($character, $sameFactionsTargetCharacter);
 
-		$differentFactionResult = $character->SameFactionCheck($character->getFactions(), $differentFactionsTargetCharacter->getFactions());
+		$differentFactionResult = $character->SameFactionCheck($character, $differentFactionsTargetCharacter);
 		// Then
 		$this->assertEquals(true, $sameFactionResult);
 		$this->assertEquals(false, $differentFactionResult);
@@ -398,11 +422,57 @@ class CharacterTest extends TestCase
 		$this->assertEquals(880, $differentFactionResult);
 	}
 
-	// test_public function prop_can_be_created()
-	// {
-	// 	// Given
-	// 	// When
-	// 	// Then
-	// }
+	public function test_prop_can_be_created()
+	{
+		// Given
+		$prop = new Prop(2000, array("x" => 0,"y" => 0,));
+		// When
+		$propHealthResult = $prop->getHealth();
+		$propPositionResult = $prop->getPosition();
+		// Then
+		$this->assertEquals(2000, $propHealthResult);
+		$this->assertEquals(array("x" => 0,"y" => 0,), $propPositionResult);
+	}
 
+	public function test_prop_can_be_attacked()
+	{
+		// Given
+		$character = new Character("Melee Fighter");
+		$targeteableProp = new Prop(2000, array("x" => 0,"y" => 0,));
+		$nonTargeteableProp = new Prop(0, array("x" => 0,"y" => 0,));
+		// When
+		$character->DealDamage($targeteableProp);
+		$targeteablePropResult = $targeteableProp->getHealth();
+
+		$character->DealDamage($nonTargeteableProp);
+		$nonTargeteablePropResult = $nonTargeteableProp->getHealth();
+		// Then
+		$this->assertEquals(1880, $targeteablePropResult);
+		$this->assertEquals(0, $nonTargeteablePropResult);
+	}
+
+	public function test_prop_cannot_be_healed()
+	{
+		// Given
+		$character = new Character("Melee Fighter");
+		$prop = new Prop(2000, array("x" => 0,"y" => 0,));
+		// When
+		$character->HealDamage($prop);
+		$result = $prop->getHealth();
+		// Then
+		$this->assertEquals(2000, $result);
+	}
+
+	public function test_prop_can_be_destroyed()
+	{
+		// Given
+		$character = new Character("Melee Fighter");
+		$prop = new Prop(200, array("x" => 0,"y" => 0,));
+		// When
+		$character->DealDamage($prop);
+		$character->DealDamage($prop);
+		$result = isset($prop);
+		// Then
+		$this->assertEquals(false, $result);
+	}
 }
